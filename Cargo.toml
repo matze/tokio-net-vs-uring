@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+clap = { version = "3", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 tokio-uring = { git = "https://github.com/tokio-rs/tokio-uring" }
