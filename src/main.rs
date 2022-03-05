@@ -6,31 +6,21 @@ struct Args {
     /// Use tokio-uring
     #[clap(long)]
     uring: bool,
-
-    /// Number of threads used by the run-time
-    #[clap(long)]
-    threads: Option<usize>,
 }
 
 static RESPONSE: &'static str =
     "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
-fn listen_regular(args: Args, addr: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn listen_regular(addr: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("Using tokio, listening on: {addr}");
 
-    let mut builder = tokio::runtime::Builder::new_multi_thread();
-
-    let rt = if let Some(num) = args.threads {
-        builder.enable_all().worker_threads(num).build()?
-    } else {
-        builder.enable_all().build()?
-    };
+    let rt = tokio::runtime::Builder::new_current_thread().enable_io().build()?;
 
     rt.block_on(async {
-        let server = tokio::net::TcpListener::bind(&addr).await?;
+        let listener = tokio::net::TcpListener::bind(&addr).await?;
 
         loop {
-            let (mut stream, _) = server.accept().await?;
+            let (mut stream, _) = listener.accept().await?;
 
             tokio::spawn(async move {
                 if let Err(err) = stream.write_all(RESPONSE.as_bytes()).await {
@@ -68,6 +58,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if args.uring {
         listen_uring(&addr)
     } else {
-        listen_regular(args, &addr)
+        listen_regular(&addr)
     }
 }
