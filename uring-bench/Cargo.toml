@@ -1,0 +1,8 @@
+[package]
+name = "uring-bench"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common-bench = { path = "../common-bench" }
+tokio-uring = "0.3.0"
