@@ -12,7 +12,7 @@ async fn main() -> io::Result<()> {
         let (mut stream, _) = listener.accept().await?;
 
         tokio::spawn(async move {
-            if let Err(err) = stream.write_all(RESPONSE.as_bytes()).await {
+            if let Err(err) = stream.write_all(RESPONSE).await {
                 eprintln!("Client connection failed: {}", err);
             }
         });
